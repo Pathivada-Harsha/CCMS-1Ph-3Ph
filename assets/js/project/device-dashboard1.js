@@ -290,9 +290,16 @@ function initializeLoadCard(data) {
         `;
 
         // Make AJAX request
+        let group_list = document.getElementById('group-list');
+
+        let group_name = group_list.value;
+
         $.ajax({
             url: '../dashboard/code/update_overload_data.php', // Replace with your actual API endpoint
             method: 'POST',
+            data: {
+                GROUP_ID: group_name // Optional data to send to PHP script
+            },
             dataType: 'json',
             success: function (response) {
                 updateOverloadTable(response);
@@ -332,17 +339,18 @@ function initializeLoadCard(data) {
             const statusText = difference > 0 ? 'Overload' : 'Normal';
 
             html += `
-                <tr>
-                    <td>${device.device_id}</td>
-                    <td>${device.total_wattage_installed} W</td>
-                    <td>${device.total_load_received} W</td>
-                    <td class="${statusClass}">${difference > 0 ? '+' : ''}${difference} W</td>
-                    <td class="${statusClass}">
-                        <i class="bi ${statusIcon} me-1"></i> ${statusText}
-                    </td>
-                </tr>
-            `;
+        <tr>
+            <td>${device.device_id}</td>
+            <td>${device.total_wattage_installed} W</td>
+            <td>${device.total_load_received} W</td>
+            <td class="${statusClass}">${Math.abs(difference)} W</td>
+            <td class="${statusClass}">
+                <i class="bi ${statusIcon} me-1"></i> ${statusText}
+            </td>
+        </tr>
+    `;
         });
+
 
         tableBody.innerHTML = html;
     }

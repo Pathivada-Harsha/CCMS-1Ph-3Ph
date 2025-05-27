@@ -15,6 +15,7 @@ $permission_check = 0;
 
 // Handle POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $group_id = $_POST['GROUP_ID'];
 
     $conn = mysqli_connect(HOST, USERNAME, PASSWORD, DB_ALL);
 

@@ -25,6 +25,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $device_id = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['deviceId']));
         $device_name = htmlspecialchars(mysqli_real_escape_string($conn, $_POST['deviceName']));
+        if (empty($device_name)) {
+            echo json_encode("Please enter Device Name");
+            mysqli_close($conn);
+            exit();
+        }
         // First, check if the device name already exists
         if ($role === "SUPERADMIN") {
             // Query for SUPERADMIN, only bind one parameter

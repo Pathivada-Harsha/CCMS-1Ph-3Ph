@@ -27,7 +27,7 @@ group_list.addEventListener('change', function () {
 var interval_Id;
 //setTimeout(refresh_data, 50);
 
-interval_Id=setInterval(refresh_data, 60000);
+interval_Id = setInterval(refresh_data, 60000);
 
 function refresh_data() {
     /*if (typeof update_frame_time === "function") {
@@ -167,58 +167,66 @@ document.getElementById('editDeviceModal').addEventListener('hidden.bs.modal', f
 function updateDeviceName() {
     var deviceId = document.getElementById('deviceId').value;
     var newDeviceName = document.getElementById('newdeviceName').value;
-
-    // Clear any previous messages in the messageBox
     var messageBox = document.getElementById('messageBox');
-    messageBox.style.display = 'none';  // Hide initially
-    messageBox.classList.remove('alert-success', 'alert-danger', 'alert-warning');
+    if (newDeviceName == "") {
+        messageBox.style.display = 'block';
+        messageBox.innerHTML = "Enter New Name the field shouldn't be Empty";
+        messageBox.classList.add('alert-danger');
+    }
+    // Clear any previous messages in the messageBox
+    else {
 
-    // Perform the device name update logic with an AJAX call
-    $.ajax({
-        url: '../device-list/code/updatenewdevicename.php',
-        type: 'POST',
-        data: { deviceId: deviceId, deviceName: newDeviceName },
-        success: function (response) {
-            console.log(response);  // Log to check the response
-            var result;
 
-            try {
-                result = JSON.parse(response);  // Parse the JSON response
+        messageBox.style.display = 'none';  // Hide initially
+        messageBox.classList.remove('alert-success', 'alert-danger', 'alert-warning');
 
-                // Handle different status cases
-                if (result.status === 'success') {
-                    messageBox.innerHTML = result.message;
-                    messageBox.classList.add('alert-success');
-                } else if (result.status === 'warning') {
-                    messageBox.innerHTML = result.message;
-                    messageBox.classList.add('alert-warning');
-                } else if (result.status === 'error') {
-                    messageBox.innerHTML = result.message;
+        // Perform the device name update logic with an AJAX call
+        $.ajax({
+            url: '../device-list/code/updatenewdevicename.php',
+            type: 'POST',
+            data: { deviceId: deviceId, deviceName: newDeviceName },
+            success: function (response) {
+                console.log(response);  // Log to check the response
+                var result;
+
+                try {
+                    result = JSON.parse(response);  // Parse the JSON response
+
+                    // Handle different status cases
+                    if (result.status === 'success') {
+                        messageBox.innerHTML = result.message;
+                        messageBox.classList.add('alert-success');
+                    } else if (result.status === 'warning') {
+                        messageBox.innerHTML = result.message;
+                        messageBox.classList.add('alert-warning');
+                    } else if (result.status === 'error') {
+                        messageBox.innerHTML = result.message;
+                        messageBox.classList.add('alert-danger');
+                    } else {
+                        // Handle unexpected statuses
+                        messageBox.innerHTML = 'Unexpected response from the server.';
+                        messageBox.classList.add('alert-danger');
+                    }
+
+                    messageBox.style.display = 'block';  // Show the message box
+                    let group_name = group_list.value;
+
+                    add_device_list(group_name);
+                } catch (e) {
+                    console.error('Error parsing JSON response:', e);
+                    messageBox.innerHTML = 'Invalid response from server.';
                     messageBox.classList.add('alert-danger');
-                } else {
-                    // Handle unexpected statuses
-                    messageBox.innerHTML = 'Unexpected response from the server.';
-                    messageBox.classList.add('alert-danger');
+                    messageBox.style.display = 'block';  // Show error message
                 }
-
-                messageBox.style.display = 'block';  // Show the message box
-                let group_name = group_list.value;
-
-                add_device_list(group_name);
-            } catch (e) {
-                console.error('Error parsing JSON response:', e);
-                messageBox.innerHTML = 'Invalid response from server.';
+            },
+            error: function (xhr, status, error) {
+                console.error('AJAX error:', status, error);
+                messageBox.innerHTML = 'An error occurred while updating the device. Please try again.';
                 messageBox.classList.add('alert-danger');
                 messageBox.style.display = 'block';  // Show error message
             }
-        },
-        error: function (xhr, status, error) {
-            console.error('AJAX error:', status, error);
-            messageBox.innerHTML = 'An error occurred while updating the device. Please try again.';
-            messageBox.classList.add('alert-danger');
-            messageBox.style.display = 'block';  // Show error message
-        }
-    });
+        });
+    }
 
     // DO NOT close the modal. The user will manually close it after reviewing the message.
 }
